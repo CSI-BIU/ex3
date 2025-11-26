@@ -18,7 +18,45 @@
 #define HUMAN 1
 #define COMPUTER 2
 
-void initBoard(char board[][COLS], int rows, int cols);
+int isColumnFull(char[][COLS], int, int, int);
+
+int isBoardFull(char[][COLS], int, int);
+
+int isInBounds(int, int, int, int);
+
+/* Return index of row where token will land, or -1 if column full */
+int getFreeRow(char[][COLS], int, int, int);
+
+/* Place token in column (0-based). Return row index or -1 if illegal */
+int makeMove(char[][COLS], int, int, int, char);
+
+int checkVictory(char[][COLS], int, int, int, int, char);
+
+/* Human player: asks repeatedly until a valid non-full column is chosen (0-based) */
+int humanChoose(char[][COLS], int, int);
+
+/* Computer*/
+int computerChoose(char[][COLS], int, int, char, char);
+
+void runConnectFour(char[][COLS], int, int, int, int);
+
+void initBoard(char[][COLS], int, int);
+
+void printBoard(char[][COLS], int, int);
+
+int getPlayerType(int);
+
+
+int main() {
+    char board[ROWS][COLS];
+    printf("Connect Four (%d rows x %d cols)\n\n", ROWS, COLS);
+    int p1Type = getPlayerType(1);
+    int p2Type = getPlayerType(2);
+    initBoard(board, ROWS, COLS);
+    printBoard(board, ROWS, COLS);
+    runConnectFour(board, ROWS, COLS, p1Type, p2Type);
+    return 0;
+}
 
 void printBoard(char board[][COLS], int rows, int cols) {
     printf("\n");
@@ -52,38 +90,4 @@ int getPlayerType(int playerNumber) {
         printf("Invalid selection. Enter h or c.\n");
         while (getchar() != '\n'); // clear rest of input
     }
-}
-
-int isColumnFull(char board[][COLS], int rows, int cols, int col);
-
-int isBoardFull(char board[][COLS], int rows, int cols);
-
-int isInBounds(int rows, int cols, int r, int c);
-
-/* Return index of row where token will land, or -1 if column full */
-int getFreeRow(char board[][COLS], int rows, int cols, int col);
-
-/* Place token in column (0-based). Return row index or -1 if illegal */
-int makeMove(char board[][COLS], int rows, int cols, int col, char token);
-
-int checkVictory(char board[][COLS], int rows, int cols, int r, int c, char token);
-
-/* Human player: asks repeatedly until a valid non-full column is chosen (0-based) */
-int humanChoose(char board[][COLS], int rows, int cols);
-
-
-/* Computer*/
-int computerChoose(char board[][COLS], int rows, int cols, char mytoken, char optoken);
-
-void runConnectFour(char board[][COLS], int rows, int cols, int p1Type, int p2Type);
-
-int main() {
-    char board[ROWS][COLS];
-    printf("Connect Four (%d rows x %d cols)\n\n", ROWS, COLS);
-    int p1Type = getPlayerType(1);
-    int p2Type = getPlayerType(2);
-    initBoard(board, ROWS, COLS);
-    printBoard(board, ROWS, COLS);
-    runConnectFour(board, ROWS, COLS, p1Type, p2Type);
-    return 0;
 }
