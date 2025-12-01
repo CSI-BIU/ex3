@@ -99,9 +99,9 @@ int isInBounds(int rows, int cols, int selection, int )
 
 
 //what the fuck is happening, too many variables 
-int getFreeRow(char board[][COLS], int rows, int selection, int isColumnFull)
+int getFreeRow(char board[][COLS], int rows, int selection, int cols)
 {
-    if(!isColumnFull)
+    if(!isColumnFull(rows, cols, selection, board))
        return selection;
      else 
      return (-1);
@@ -110,8 +110,23 @@ int getFreeRow(char board[][COLS], int rows, int selection, int isColumnFull)
 
 
 
-int makeMove(char board[][COLS], int rows, int cols, int selection, char )
+int makeMove(char board[][COLS], int rows, int cols, int selection, char token)
 {
+    if(!isColumnFull(rows, cols, selection, board))
+      return -1;
+     else
+     { if(!isInBounds(rows, cols, selection, board))
+           return -1;
+        else
+         for(int r = 0; r<rows; r++)
+         {
+            if(board[r][selection]==EMPTY)
+            {
+              board[r][selection]=token;
+              return 0;
+            }
+         }
+     }
 
 
 
