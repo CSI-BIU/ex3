@@ -18,6 +18,13 @@
 #define HUMAN 1
 #define COMPUTER 2
 
+//defines of my own
+
+#define TRUE 1
+#define FALSE 0
+
+
+
 int isColumnFull(char[][COLS], int, int, int);
 
 int isBoardFull(char[][COLS], int, int);
@@ -57,6 +64,71 @@ int main() {
     runConnectFour(board, ROWS, COLS, p1Type, p2Type);
     return 0;
 }
+
+int isColumnFull(char board[][COLS], int rows, int cols, int selection)
+{
+    for(int r = 0; r<rows; r++ )
+    {
+        if(board[r][selection]==EMPTY)
+         return FALSE;
+    }
+  return TRUE;      
+}
+
+int isBoardFull(char board[][COLS], int rows, int cols)
+{ 
+    for (int r = 0; r<rows; r++) 
+    {   
+        for (int c = 0; c < cols; c++) 
+        {
+           if(board[r][c]==EMPTY)
+             return FALSE; 
+        }
+    }
+    return TRUE;
+}
+
+
+//Not sure if that's what they meant need to go over it again, too many variables
+int isInBounds(int rows, int cols, int selection, int )
+{
+
+    if((selection<0)&&(selection>cols))
+       return FALSE;
+}
+
+
+//what the fuck is happening, too many variables 
+int getFreeRow(char board[][COLS], int rows, int selection, int isColumnFull)
+{
+    if(!isColumnFull)
+       return selection;
+     else 
+     return (-1);
+
+}
+
+
+
+int makeMove(char board[][COLS], int rows, int cols, int selection, char )
+{
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
 
 void printBoard(char board[][COLS], int rows, int cols) {
     printf("\n");
