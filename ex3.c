@@ -28,14 +28,14 @@ int askNumber(char[][COLS], int, int);
 
 
 
-int isColumnFull(char[][COLS], int, int, int);
+int isColumnFull(char[][COLS], int, int);
 
 int isBoardFull(char[][COLS], int, int);
 
-int isInBounds(int, int, int, int);
+int isInBounds(int, int);
 
 /* Place token in column (0-based). Return row index or -1 if illegal */
-int makeMove(char[][COLS], int, int, int, char);
+void makeMove(char[][COLS], int, int, char);
 
 int checkVictory(char[][COLS], int, int, int, int, char);
 
@@ -64,48 +64,56 @@ int main() {
     runConnectFour(board, ROWS, COLS, p1Type, p2Type);
     return 0;
 }
+
 void initBoard(char board[][COLS], int rows, int cols)
 {
-    for(int r=0; r<rows; r++)
+    for(int r=0; r<=rows; r++)
     {
-        for(int c=0; c<cols, c++)
+        for(int c=0; c<=cols; c++)
         {
             board[c][r]=EMPTY;
         }
     }
 }
+
+
 int askNumber(char board[][COLS], int rows, int cols)
 {   int selection;
     int forever=0;
-    printf("Enter column (1-%d : \n", cols),
+    printf("Enter column (1-%d) : \n", cols);
     while(forever==0)
     {
         scanf("%d", &selection);
-        if(isInBounds(rows, cols, selection))
-          if(!isColumnFull)
+        if(isInBounds(cols, selection))
+          if(!isColumnFull(board, rows, selection))
           { 
             return selection;
           }
-        continue;
+     continue;
     }
+    return 0;
 }
 
 
-int isColumnFull(char board[][COLS], int rows, int cols, int selection)
+int isColumnFull(char board[][COLS], int rows, int selection)
 {
-    for(int r = 0; r<rows; r++ )
+    for(int r = rows-1; r>=0; r--)
     {
-        if(board[r][selection]==EMPTY)
-         return FALSE;
+        if(board[r][selection-1]==EMPTY)
+        {
+          return FALSE;
+        }
+        
     }
+  printf("Column %d is full. Choose another column.\n", selection);
   return TRUE;      
 }
 
 int isBoardFull(char board[][COLS], int rows, int cols)
 { 
-    for (int r = 0; r<rows; r++) 
+    for (int r = rows-1; r>=0; r--) 
     {   
-        for (int c = 0; c < cols; c++) 
+        for (int c = cols-1; c >= 0; c--) 
         {
            if(board[r][c]==EMPTY)
              return FALSE; 
@@ -115,12 +123,12 @@ int isBoardFull(char board[][COLS], int rows, int cols)
 }
 
 //Not sure if that's what they meant need to go over it again, too many variables
-int isInBounds(int rows, int cols, int selection, int )
+int isInBounds(int cols, int selection)
 {
 
-    if((selection<0)&&(selection>cols))
+    if(!((selection<=cols)&&(selection>0)))
     {
-       printf("Invalid Input");
+       printf("Invalid Input\n");
        return FALSE;
     }
     else 
@@ -128,14 +136,14 @@ int isInBounds(int rows, int cols, int selection, int )
 }
 
 
-int makeMove(char board[][COLS], int rows, int cols, int selection, char token)
+void makeMove(char board[][COLS], int rows, int selection, char token)
 {
-         for(int r = 0; r<rows; r++)
+         for(int r = rows-1; r>=0; r--)
          {
-            if(board[r][selection]==EMPTY)
+            if(board[r][selection-1]==EMPTY)
             {
-              board[r][selection]=token;
-              return 0;
+              board[r][selection-1]=token;
+              return;
             }
          }
      
@@ -181,59 +189,49 @@ int getPlayerType(int playerNumber) {
     }
 }
 
-void runConnectFour(char board[][COLS], int ROWS, int COLS, int p1Type, int p2Type)
-{  int forever=0;
+void runConnectFour(char board[][COLS], int rows,  int cols, int p1Type, int p2Type)
+{   int forever=0;
     int selection;
     while(forever==0)
-    {
+    {   printf("Player 1 (X) turn.\n");
         if(p1Type==HUMAN)
-        {
-         selection = askNumber(board[][COLS], ROWS, COLS);
-         makeMove(board[][COLS], ROWS, COLS, selection, TOKEN_P1);
+        { 
+         selection = askNumber(board, rows, cols);
+         makeMove(board, rows, selection, TOKEN_P1);
+         printBoard(board, rows, cols);
         }
-         else
-          computerChoose();
-        if(checkVictory)
+         //else
+          //computerChoose();
+       // if(checkVictory)
+       // {
+        //  printf("Player 1 (X) wins!\n");
+         // break;
+     //   }
+        if(isBoardFull(board, rows, cols))
         {
-          printf("adadacdaca");
+          printf("Board full and no winner. It's a tie!\n");
           break;
         }
-        if(!isBoardFull(board[][COLS], ROWS, COLS))
-        {
-          printf("adadacdaca");
-          break;
-        }
-
+        printf("Player 2 (O) turn.\n");
         if(p2Type==HUMAN)
         { 
-            selection = askNumber(board[][COLS], ROWS, COLS);
-            makeMove(board[][COLS], ROWS, COLS, selection, TOKEN_P2);
+            selection = askNumber(board, rows, COLS);
+            makeMove(board, rows, selection, TOKEN_P2);
+            printBoard(board, rows, cols);
         }
-            else 
-             computerChoose();
-         if(checkVictory)
+           // else 
+             //computerChoose();
+         //if(checkVictory)
+        //{
+        //  printf("Player 2 (O) wins!\n");
+        //  break;
+      //  }
+        if(isBoardFull(board, ROWS, COLS))
         {
-          printf("adadacdaca");
-          break;
-        }
-        if(!isBoardFull(board[][COLS], ROWS, COLS))
-        {
-          printf("adadacdaca");
+          printf("Board full and no winner. It's a tie!\n");
           break;
         }
      }
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
 
