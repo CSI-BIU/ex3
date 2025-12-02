@@ -24,7 +24,7 @@
 #define FALSE 0
 
 //functions of my own
-int askNumber(char[][COLS], int, int, int);
+int askNumber(char[][COLS], int, int);
 
 
 
@@ -74,7 +74,7 @@ void initBoard(char board[][COLS], int rows, int cols)
         }
     }
 }
-int askNumber(char board[][COLS], int rows, int cols, int selection)
+int askNumber(char board[][COLS], int rows, int cols)
 {   int selection;
     int forever=0;
     printf("Enter column (1-%d : \n", cols),
@@ -130,12 +130,6 @@ int isInBounds(int rows, int cols, int selection, int )
 
 int makeMove(char board[][COLS], int rows, int cols, int selection, char token)
 {
-    if(!isColumnFull(rows, cols, selection, board))
-      return -1;
-     else
-     { if(!isInBounds(rows, cols, selection, board))
-           return -1;
-        else
          for(int r = 0; r<rows; r++)
          {
             if(board[r][selection]==EMPTY)
@@ -144,7 +138,7 @@ int makeMove(char board[][COLS], int rows, int cols, int selection, char token)
               return 0;
             }
          }
-     }
+     
 }
 
 
@@ -186,3 +180,74 @@ int getPlayerType(int playerNumber) {
         while (getchar() != '\n'); // clear rest of input
     }
 }
+
+void runConnectFour(char board[][COLS], int ROWS, int COLS, int p1Type, int p2Type)
+{  int forever=0;
+    int selection;
+    while(forever==0)
+    {
+        if(p1Type==HUMAN)
+        {
+         selection = askNumber(board[][COLS], ROWS, COLS);
+         makeMove(board[][COLS], ROWS, COLS, selection, TOKEN_P1);
+        }
+         else
+          computerChoose();
+        if(checkVictory)
+        {
+          printf("adadacdaca");
+          break;
+        }
+        if(!isBoardFull(board[][COLS], ROWS, COLS))
+        {
+          printf("adadacdaca");
+          break;
+        }
+
+        if(p2Type==HUMAN)
+        { 
+            selection = askNumber(board[][COLS], ROWS, COLS);
+            makeMove(board[][COLS], ROWS, COLS, selection, TOKEN_P2);
+        }
+            else 
+             computerChoose();
+         if(checkVictory)
+        {
+          printf("adadacdaca");
+          break;
+        }
+        if(!isBoardFull(board[][COLS], ROWS, COLS))
+        {
+          printf("adadacdaca");
+          break;
+        }
+     }
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+    
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
