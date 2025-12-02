@@ -37,13 +37,13 @@ int isInBounds(int, int);
 /* Place token in column (0-based). Return row index or -1 if illegal */
 void makeMove(char[][COLS], int, int, char);
 
-int checkVictory(char[][COLS], int, int, int, int, char);
+int checkVictory(char[][COLS], int, int, int, char);
 
 /* Human player: asks repeatedly until a valid non-full column is chosen (0-based) */
 int humanChoose(char[][COLS], int, int);
 
 /* Computer*/
-int computerChoose(char[][COLS], int, int, char, char);
+int computerChoose(char[][COLS], int, int, char, int);
 
 void runConnectFour(char[][COLS], int, int, int, int);
 
@@ -122,7 +122,7 @@ int isBoardFull(char board[][COLS], int rows, int cols)
     return TRUE;
 }
 
-//Not sure if that's what they meant need to go over it again, too many variables
+
 int isInBounds(int cols, int selection)
 {
 
@@ -149,11 +149,72 @@ void makeMove(char board[][COLS], int rows, int selection, char token)
      
 }
 
+int checkVictory(char board[][COLS], int rows, int cols, int winCon, char token)
+{
+    int count=0;
+    //horizontal check
+ for (int r = rows-1; r>=0; r--) 
+    {   
+        for (int c = cols-1; c >= winCon; c--) 
+        { count=0;
+           for(int i=0; i<winCon; i++)
+           {
+             if(token==board[r][c-i])
+              count++;
+           } 
+           if(count>=winCon)
+            return TRUE;
+        }
+    }
+    //vertical check
+ for(int c = cols-1; c >= 0; c--)
+ {
+   for (int r = rows-1; r >= 0; r--) 
+        { count=0;
+           for(int i=0; i<winCon ; i++)
+            {
+                
+                 if(token==board[r-i][c])
+                  count++;
+            }
+            if(count>=winCon)
+              return TRUE;
+        }
+ }
+    // diagonal check- right to left 
+  for(int r = rows-1; r >= 0; r--)
+       {
+        for (int c = cols; c >= 0; c--) 
+         {  count=0;
+            for(int i=0; i<=cols; i++)
+            {
+               if(token==board[r-i][c-i])
+                count++;
+               if(count==winCon)
+                 return TRUE;
+            }
+         }
+       }
+     //diagonal check- left to right 
+    for(int r = rows-1; r >= 0; r--)
+       {
+        for (int c = 0; c<cols; c++) 
+         {  count=0;
+            for(int i=0; i<=cols; i++)
+            {
+               if(token==board[r-i][c+i])
+                count++;
+               if(count==winCon)
+                return TRUE;
+            }
+           
+         }
+       }
+
+return FALSE;
 
 
-
-
-
+}
 
 void printBoard(char board[][COLS], int rows, int cols) {
     printf("\n");
@@ -170,7 +231,6 @@ void printBoard(char board[][COLS], int rows, int cols) {
     }
     printf("\n\n");
 }
-
 int getPlayerType(int playerNumber) {
     char ch;
     while (1) {
@@ -189,6 +249,87 @@ int getPlayerType(int playerNumber) {
     }
 }
 
+
+int computerChoose(char board[][COLS], int rows, int cols, char token, int winCon)
+{  int count=0;
+    //horizontal check if computer can win right to left
+    for (int r = rows-1; r>=0; r--) 
+    {   
+        for (int c = cols-1; c >= winCon; c--) 
+        { count=0;
+           for(int i=0; i<winCon-1; i++)
+           {
+              if(token==board[r][c-i])
+               count++;
+
+              if(count==winCon-1)
+              {
+                if(board[r][c-i-1]==EMPTY)
+                {
+                  if(board[r-1][c-i-1]!=EMPTY)
+                     { 
+                     board[r][c-i-1]=token;
+                     return 0;
+                     }
+                }
+              }
+           } 
+           
+
+        }
+    }
+
+    //horizontal left to right
+    for(int r = rows-1; r >= 0; r--)
+       {
+        for (int c = 0; c<cols; c++) 
+         {  count=0;
+            for(int i=0; i<=cols; i++)
+            {
+                  if(token==board[r][c-i])
+                    count++;
+
+               if(count==winCon-1)
+              {
+                if(board[r][c+i+1]==EMPTY)
+                {
+                  if(board[r-1][c+i+1]!=EMPTY)
+                     { 
+                     board[r][c+i+1]=token;
+                     return 0;
+                     }
+                }
+              }
+         }
+       }
+    }
+
+    //vertical check if computer can win
+   for(int c = cols-1; c >= 0; c--)
+   {
+   for (int r = rows-1; r >= 0; r--) 
+        { count=0;
+           for(int i=0; i<winCon-1 ; i++)
+            {
+                
+                 if(token==board[r-i][c])
+                 { count++;}
+                  
+
+                  if(count==winCon-1)
+                   if(board[r-i-1][c]==EMPTY)
+                {
+                board[r-i-1][c]=token;
+                return 0;
+               }
+            }
+            
+        }
+    }
+    //diagonal check if computer can win- right to left
+     
+}
+
 void runConnectFour(char board[][COLS], int rows,  int cols, int p1Type, int p2Type)
 {   int forever=0;
     int selection;
@@ -202,11 +343,11 @@ void runConnectFour(char board[][COLS], int rows,  int cols, int p1Type, int p2T
         }
          //else
           //computerChoose();
-       // if(checkVictory)
-       // {
-        //  printf("Player 1 (X) wins!\n");
-         // break;
-     //   }
+        if(checkVictory(board, rows, cols, CONNECT_N, TOKEN_P1))
+        {
+         printf("Player 1 (X) wins!\n");
+         break;
+         }
         if(isBoardFull(board, rows, cols))
         {
           printf("Board full and no winner. It's a tie!\n");
@@ -221,11 +362,11 @@ void runConnectFour(char board[][COLS], int rows,  int cols, int p1Type, int p2T
         }
            // else 
              //computerChoose();
-         //if(checkVictory)
-        //{
-        //  printf("Player 2 (O) wins!\n");
-        //  break;
-      //  }
+         if(checkVictory(board, rows, cols, CONNECT_N, TOKEN_P2))
+        {
+        printf("Player 2 (O) wins!\n");
+         break;
+        }
         if(isBoardFull(board, ROWS, COLS))
         {
           printf("Board full and no winner. It's a tie!\n");
