@@ -23,6 +23,9 @@
 #define TRUE 1
 #define FALSE 0
 
+//functions of my own
+int askNumber(char[][COLS], int, int, int);
+
 
 
 int isColumnFull(char[][COLS], int, int, int);
@@ -30,9 +33,6 @@ int isColumnFull(char[][COLS], int, int, int);
 int isBoardFull(char[][COLS], int, int);
 
 int isInBounds(int, int, int, int);
-
-/* Return index of row where token will land, or -1 if column full */
-int getFreeRow(char[][COLS], int, int, int);
 
 /* Place token in column (0-based). Return row index or -1 if illegal */
 int makeMove(char[][COLS], int, int, int, char);
@@ -64,6 +64,32 @@ int main() {
     runConnectFour(board, ROWS, COLS, p1Type, p2Type);
     return 0;
 }
+void initBoard(char board[][COLS], int rows, int cols)
+{
+    for(int r=0; r<rows; r++)
+    {
+        for(int c=0; c<cols, c++)
+        {
+            board[c][r]=EMPTY;
+        }
+    }
+}
+int askNumber(char board[][COLS], int rows, int cols, int selection)
+{   int selection;
+    int forever=0;
+    printf("Enter column (1-%d : \n", cols),
+    while(forever==0)
+    {
+        scanf("%d", &selection);
+        if(isInBounds(rows, cols, selection))
+          if(!isColumnFull)
+          { 
+            return selection;
+          }
+        continue;
+    }
+}
+
 
 int isColumnFull(char board[][COLS], int rows, int cols, int selection)
 {
@@ -88,26 +114,18 @@ int isBoardFull(char board[][COLS], int rows, int cols)
     return TRUE;
 }
 
-
 //Not sure if that's what they meant need to go over it again, too many variables
 int isInBounds(int rows, int cols, int selection, int )
 {
 
     if((selection<0)&&(selection>cols))
+    {
+       printf("Invalid Input");
        return FALSE;
+    }
+    else 
+     return TRUE;
 }
-
-
-//what the fuck is happening, too many variables 
-int getFreeRow(char board[][COLS], int rows, int selection, int cols)
-{
-    if(!isColumnFull(rows, cols, selection, board))
-       return selection;
-     else 
-     return (-1);
-
-}
-
 
 
 int makeMove(char board[][COLS], int rows, int cols, int selection, char token)
@@ -127,16 +145,6 @@ int makeMove(char board[][COLS], int rows, int cols, int selection, char token)
             }
          }
      }
-
-
-
-
-
-
-
-
-
-
 }
 
 
