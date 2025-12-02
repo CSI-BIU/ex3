@@ -236,17 +236,6 @@ void runConnectFour(char board[][COLS], int ROWS, int COLS, int p1Type, int p2Ty
 
     }
 
-    
-
-
-
-
-
-
-
-
-}
-
 
 
 
