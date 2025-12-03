@@ -184,7 +184,7 @@ int checkVictory(char board[][COLS], int rows, int cols, int winCon, char token)
     // diagonal check- right to left 
   for(int r = rows-1; r >= 0; r--)
        {
-        for (int c = cols; c >= 0; c--) 
+        for (int c = cols-1; c >= 0; c--) 
          {  count=0;
             for(int i=0; i<=cols; i++)
             {
@@ -249,9 +249,19 @@ int getPlayerType(int playerNumber) {
     }
 }
 
-
+//I'm sorry in advance
 int computerChoose(char board[][COLS], int rows, int cols, char token, int winCon)
 {  int count=0;
+   int horRight=-1;
+   int horLeft=-1;
+   int vert=-1;
+   int diagTL=-1;
+   int diagBT=-1;
+   char oppToken;
+   if(token==TOKEN_P1)
+      char oppToken=TOKEN_P2;
+    else
+      char oppToken=TOKEN_P1;
     //horizontal check if computer can win right to left
     for (int r = rows-1; r>=0; r--) 
     {   
@@ -268,14 +278,16 @@ int computerChoose(char board[][COLS], int rows, int cols, char token, int winCo
                 {
                   if(board[r-1][c-i-1]!=EMPTY)
                      { 
-                     board[r][c-i-1]=token;
-                     return 0;
+                     horRight= (c-i-1);
                      }
                 }
               }
-           } 
-           
+                else{
+                     if((count==winCon-2)&&(board[r-1][c-i-1]!=EMPTY)&&(board[r][c-i-1]==EMPTY)&&(board[r][c-i-2]==token))
+                      horRight= (c-i-1);
 
+                }
+           } 
         }
     }
 
@@ -295,11 +307,15 @@ int computerChoose(char board[][COLS], int rows, int cols, char token, int winCo
                 {
                   if(board[r-1][c+i+1]!=EMPTY)
                      { 
-                     board[r][c+i+1]=token;
-                     return 0;
+                     horLeft=(c+i+1);
                      }
                 }
               }
+              else {
+               if((count==winCon-2)&&(board[r][c+i+1]==EMPTY)&&(board[r-1][c+i+1]!=EMPTY)&&(board[r][c+i+2]==token))
+                horLeft=(c+i+1);
+              }
+
          }
        }
     }
@@ -317,17 +333,220 @@ int computerChoose(char board[][COLS], int rows, int cols, char token, int winCo
                   
 
                   if(count==winCon-1)
-                   if(board[r-i-1][c]==EMPTY)
-                {
-                board[r-i-1][c]=token;
-                return 0;
-               }
+                  {
+                   if((board[r-i-1][c]==EMPTY))
+                    vert=c;
+                   }    
             }
             
         }
     }
-    //diagonal check if computer can win- right to left
-     
+    //diagonal check if computer can win- starts at top left and goes right
+    for(int r = 0; r < rows-1; r++)
+       {
+        for (int c = 0; c < cols-1; c++) 
+         {  count=0;
+            for(int i=0; i<=cols; i++)
+            {
+               if(token==board[r+i][c+i]){
+                count++;}
+               if(count==winCon-1){
+                 if((board[r+i+1][c+i+1]==EMPTY)&&(board[r+i+2][c+i+1]!=EMPTY))
+                {
+                diagTL= (c+i+1);
+               }
+              }
+               else
+               {   if((count==winCon-2)&&(board[r+i+1][c+i+1]==EMPTY)&&(board[r+i+2][c+i+2]==token)&&(board[r+i+2][c+i+1]!=EMPTY))
+                      diagTL= (c+i+1);
+               }
+
+            }
+         }
+       }
+
+      //diagonal check if computer can win- starts at bot right 
+     for(int r = rows-1; r >= 0; r--)
+       {
+        for (int c = cols-1; c >= 0; c--) 
+         {  count=0;
+            for(int i=0; i<=cols; i++)
+            {
+               if(token==board[r-i][c-i]){
+                count++;}
+               if(count==winCon-1)
+                 {
+                     if((board[r-i-1][c-i-1]==EMPTY)&&(board[r-i][c-i-1]!=EMPTY))
+                    {
+                      diagBT= (c-i-1);
+                    } 
+               }
+                 else
+                 { if((count==winCon-2)&&(board[r-i-1][c-i-1]==EMPTY)&&(board[r-i-2][c-i-2]==token)&&(board[r-i][c-i-1]!=EMPTY))
+                    diagBT= (c-i-1);
+                   }
+            }
+         }
+       }
+  //logit time!!!!!!
+
+
+
+
+
+
+
+
+
+
+//Bocking the opponent 
+   int horRight=-1;
+   int horLeft=-1;
+   int vert=-1;
+   int diagTL=-1;
+   int diagBT=-1;
+   char oppToken;
+//horizontal check if computer blocks right to left
+    for (int r = rows-1; r>=0; r--) 
+    {   
+        for (int c = cols-1; c >= winCon; c--) 
+        { count=0;
+           for(int i=0; i<winCon-1; i++)
+           {
+              if(oppToken==board[r][c-i])
+               count++;
+
+              if(count==winCon-1)
+              {
+                if(board[r][c-i-1]==EMPTY)
+                {
+                  if(board[r-1][c-i-1]!=EMPTY)
+                     { 
+                     horRight= (c-i-1);
+                     }
+                }
+              }
+                else{
+                     if((count==winCon-2)&&(board[r-1][c-i-1]!=EMPTY)&&(board[r][c-i-1]==EMPTY)&&(board[r][c-i-2]==oppToken))
+                      horRight= (c-i-1);
+
+                }
+           } 
+        }
+    }
+
+    //horizontal left to right
+    for(int r = rows-1; r >= 0; r--)
+       {
+        for (int c = 0; c<cols; c++) 
+         {  count=0;
+            for(int i=0; i<=cols; i++)
+            {
+                  if(oppToken==board[r][c-i])
+                    count++;
+
+               if(count==winCon-1)
+              {
+                if(board[r][c+i+1]==EMPTY)
+                {
+                  if(board[r-1][c+i+1]!=EMPTY)
+                     { 
+                     horLeft=(c+i+1);
+                     }
+                }
+              }
+              else {
+               if((count==winCon-2)&&(board[r][c+i+1]==EMPTY)&&(board[r-1][c+i+1]!=EMPTY)&&(board[r][c+i+2]==oppToken))
+                horLeft=(c+i+1);
+              }
+
+         }
+       }
+    }
+
+    //vertical check if computer blocks
+   for(int c = cols-1; c >= 0; c--)
+   {
+   for (int r = rows-1; r >= 0; r--) 
+        { count=0;
+           for(int i=0; i<winCon-1 ; i++)
+            {
+                
+                 if(oppToken==board[r-i][c])
+                 { count++;}
+                  
+
+                  if(count==winCon-1)
+                  {
+                   if((board[r-i-1][c]==EMPTY))
+                    vert=c;
+                   }    
+            }
+            
+        }
+    }
+    //diagonal check if computer blocks- starts at top left and goes right
+    for(int r = 0; r < rows-1; r++)
+       {
+        for (int c = 0; c < cols-1; c++) 
+         {  count=0;
+            for(int i=0; i<=cols; i++)
+            {
+               if(oppToken==board[r+i][c+i]){
+                count++;}
+               if(count==winCon-1){
+                 if((board[r+i+1][c+i+1]==EMPTY)&&(board[r+i+2][c+i+1]!=EMPTY))
+                {
+                diagTL= (c+i+1);
+               }
+              }
+               else
+               {   if((count==winCon-2)&&(board[r+i+1][c+i+1]==EMPTY)&&(board[r+i+2][c+i+2]==oppToken)&&(board[r+i+2][c+i+1]!=EMPTY))
+                      diagTL= (c+i+1);
+               }
+
+            }
+         }
+       }
+
+      //diagonal check if computer can blocks- starts at bot right 
+     for(int r = rows-1; r >= 0; r--)
+       {
+        for (int c = cols-1; c >= 0; c--) 
+         {  count=0;
+            for(int i=0; i<=cols; i++)
+            {
+               if(oppToken==board[r-i][c-i]){
+                count++;}
+               if(count==winCon-1)
+                 {
+                     if((board[r-i-1][c-i-1]==EMPTY)&&(board[r-i][c-i-1]!=EMPTY))
+                    {
+                      diagBT= (c-i-1);
+                    } 
+               }
+                 else
+                 { if((count==winCon-2)&&(board[r-i-1][c-i-1]==EMPTY)&&(board[r-i-2][c-i-2]==oppToken)&&(board[r-i][c-i-1]!=EMPTY))
+                    diagBT= (c-i-1);
+                   }
+            }
+         }
+       }
+
+//sequence of 3!!!!!!
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 void runConnectFour(char board[][COLS], int rows,  int cols, int p1Type, int p2Type)
