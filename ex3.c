@@ -25,7 +25,7 @@
 
 //functions of my own
 int askNumber(char[][COLS], int, int);
-
+int checkCompCanWin(char[][COLS], int, int, int, char, char);
 
 
 int isColumnFull(char[][COLS], int, int);
@@ -49,6 +49,8 @@ void initBoard(char[][COLS], int, int);
 void printBoard(char[][COLS], int, int);
 
 int getPlayerType(int);
+
+int isColumnEmptyPC(char [][COLS], int, int);
 
 
 int main() {
@@ -106,6 +108,21 @@ int isColumnFull(char board[][COLS], int rows, int selection)
   return TRUE;      
 }
 
+int isColumnEmptyPC(char board[][COLS], int rows, int selection)
+{
+    for(int r = rows-1; r>=0; r--)
+    {
+        if(board[r][selection]==EMPTY)
+        {
+          return TRUE;
+        }
+        
+    }
+  return FALSE;      
+}
+
+
+
 int isBoardFull(char board[][COLS], int rows, int cols)
 { 
     for (int r = rows-1; r>=0; r--) 
@@ -132,50 +149,48 @@ int isInBounds(int cols, int selection)
      return TRUE;
 }
 
-
 void makeMove(char board[][COLS], int rows, int selection, char token)
 {
          for(int r = rows-1; r>=0; r--)
          {
-            if(board[r][selection-1]==EMPTY)
+            if(board[r][selection]==EMPTY)
             {
-              board[r][selection-1]=token;
+              board[r][selection]=token;
               return;
             }
          }
      
 }
 
+//check victory works
 int checkVictory(char board[][COLS], int rows, int cols, int winCon, char token)
 {
     int count=0;
     //horizontal check
  for (int r = rows-1; r>=0; r--) 
     {   
-        for (int c = cols-1; c >= winCon; c--) 
-        { count=0;
-           for(int i=0; i<winCon; i++)
-           {
-             if(token==board[r][c-i])
+        for (int c = cols-1; c >= 0; c--) 
+        { 
+             if(token==board[r][c])
               count++;
-           } 
-           if(count>=winCon)
-            return TRUE;
+              else 
+               count=0;
+              if(count==winCon)
+               return TRUE;
         }
     }
     //vertical check
  for(int c = cols-1; c >= 0; c--)
  {
    for (int r = rows-1; r >= 0; r--) 
-        { count=0;
-           for(int i=0; i<winCon ; i++)
-            {
-                
-                 if(token==board[r-i][c])
-                  count++;
-            }
-            if(count>=winCon)
-              return TRUE;
+        {     
+            if(token==board[r][c])
+              count++;
+              else
+              count=0;
+            if(count==winCon)
+               return TRUE;
+           
         }
  }
     // diagonal check- right to left 
@@ -209,9 +224,10 @@ int checkVictory(char board[][COLS], int rows, int cols, int winCon, char token)
        }
 
 return FALSE;
-
-
 }
+
+
+
 
 void printBoard(char board[][COLS], int rows, int cols) {
     printf("\n");
@@ -246,789 +262,226 @@ int getPlayerType(int playerNumber) {
     }
 }
 
-//I'm sorry in advance
-int computerChoose(char board[][COLS], int rows, int cols, char token, int winCon)
-{  int count=0;
+int checkCompCanWin(char board[][COLS], int rows, int cols, int winCon, char token,char oppToken)
+{
+   int count=0;
    int horRight=-1;
    int horLeft=-1;
    int vert=-1;
    int diagTL=-1;
-   int diagBT=-1;
+   int diagBL=-1;
+   int diagBR=-1;
+   int diagTR=-1;
+    //horizontal check right to left
+ for (int r = rows-1; r>=0; r--) 
+    {   
+        for (int c = cols-1; c >= 0; c--) 
+        { 
+             if(token==board[r][c])
+              count++;
+              else 
+               count=0;
+              if((count==winCon)&&(board[r][c-1]==EMPTY)&&((board[r-1][c-1]==TOKEN_P1)||(board[r-1][c-1]==TOKEN_P2)))
+               horRight= (c-1);
+        }
+    }
+  //horizontal check left to right
+  for (int r = rows-1; r>=0; r--) 
+    {   
+        for (int c = 0; c < cols; c++) 
+        { 
+             if(token==board[r][c])
+              count++;
+              else 
+               count=0;
+              if((count==winCon)&&(board[r][c+1]==EMPTY)&&((board[r-1][c+1]==TOKEN_P1)||(board[r-1][c+1]==TOKEN_P2)))
+               horLeft=(c+1);
+        }
+    }
+    //vertical check
+ for(int c = cols-1; c >= 0; c--)
+ {
+   for (int r = rows-1; r >= 0; r--) 
+        {     
+            if(token==board[r][c])
+              count++;
+              else
+              count=0;
+            if((count==winCon)&&(board[r-1][c]==EMPTY))
+               vert=c;
+           
+        }
+ }
+    // diagonal check- bottorm right right to left 
+  for(int r = rows-1; r >= 0; r--)
+       {
+        for (int c = cols-1; c >= 0; c--) 
+         {  count=0;
+            for(int i=0; i<=cols; i++)
+            {
+               if(token==board[r-i][c-i])
+                count++;
+               if((count==winCon)&&(board[r-i-1][c-i-1]==EMPTY)&&((board[r-i][c-i-1]==TOKEN_P1)||(board[r-i-1][c-1-i]==TOKEN_P2)))
+                 diagBR= (c-i-1);
+            }
+         }
+       }
+     //diagonal check- top right right to left 
+    for(int r = 0; r < rows; r++)
+       {
+        for (int c = cols-1; c >= 0; c--) 
+         {  count=0;
+            for(int i=0; i<=cols; i++)
+            {
+               if(token==board[r+i][c-i])
+                count++;
+               if((count==winCon)&&(board[r+i+1][c-i-1]==EMPTY)&&((board[r+i][c-i-1]==TOKEN_P1)||(board[r+i+1][c-1-i]==TOKEN_P2)))
+                 diagTR=(c-i-1);
+            }
+         }
+       }
+
+
+    
+      //diagonal check- bottom left: left to right
+       for(int c = 0; c < cols; c++)
+       {
+        for (int r = rows-1; r >= 0; r--) 
+         {  count=0;
+            for(int i=0; i<=cols; i++)
+            {
+               if(token==board[r-i][c+i])
+                count++;
+               if((count==winCon)&&(board[r-i-1][c+i+1]==EMPTY)&&((board[r-i][c+i+1]==TOKEN_P1)||(board[r-i-1][c+1+i]==TOKEN_P2)))
+                 diagBL=(c+i+1);
+            }
+         }
+       }
+     //diagonal check- top left: left to right
+     for(int c = 0; c < cols; c++)
+       {
+        for (int r = 0; r < rows; r++) 
+         {  count=0;
+            for(int i=0; i<=cols; i++)
+            {
+               if(token==board[r+i][c+i])
+                count++;
+               if((count==winCon)&&(board[r+i+1][c+i+1]==EMPTY)&&((board[r+i][c+i+1]==TOKEN_P1)||(board[r+i+1][c+1+i]==TOKEN_P2)))
+                 diagTL=(c+i+1);
+            }
+         }
+       }
+//logic for return and make move
+int priority[cols];
+    if (cols%2 == 0) {
+        priority[0] = cols/2 - 1;
+        for (int i = 1, j = 1; i < cols; i += 2, j++) {
+            priority[i] = priority[0] + j;
+            if ((i + 1) < cols) {
+                priority[i + 1] = priority[0] - j;
+            }
+        }
+    } else {
+        priority[0] = cols/2;
+        for (int i = 1, j = 1; i < cols; i += 2, j++) {
+            priority[i] = priority[0] - j;
+            priority[i + 1] = priority[0] + j;
+        }
+    }
+   for(int i=0; i<cols; i++)
+   {
+     if(horRight==priority[i])
+     {
+       makeMove(board, rows, horRight, oppToken);
+       return horRight;
+     }
+    if(horLeft== priority[i])
+     {
+       makeMove(board, rows, horLeft, oppToken);
+       return horLeft;
+     }
+    if(vert==priority[i])
+     {
+       makeMove(board, rows, vert, oppToken);
+       return vert;
+     }
+    if(diagTL== priority[i])
+     {
+       makeMove(board, rows, diagTL, oppToken);
+       return diagTL;
+     }
+    if(diagBL== priority[i])
+     {
+       makeMove(board, rows, diagBL, oppToken);
+       return diagBL;
+     }
+    if(diagTR== priority[i])
+     {
+       makeMove(board, rows, diagTR, oppToken);
+       return diagTR;
+     }
+    if(diagBR== priority[i])
+     {
+       makeMove(board, rows, diagBR, oppToken);
+       return diagBR;
+     }
+     
+   }
+return -1;
+}
+
+
+
+
+
+//I'm sorry in advance
+int computerChoose(char board[][COLS], int rows, int cols, char token, int winCon)
+{ 
    char oppToken;
    if(token==TOKEN_P1)
       oppToken=TOKEN_P2;
     else
       oppToken=TOKEN_P1;
-    //horizontal check if computer can win right to left
-    for (int r = rows-1; r>=0; r--) 
-    {   
-        for (int c = cols-1; c >= winCon; c--) 
-        { count=0;
-           for(int i=0; i<winCon-1; i++)
-           {
-              if(token==board[r][c-i])
-               count++;
+    //horizontal check if can win
+     
+    if(checkCompCanWin(board, rows, cols,winCon-1 ,token, token)!=-1)
+      return checkCompCanWin(board, rows, cols,winCon-1 ,token, token);
 
-              if(count==winCon-1)
-              {
-                if(board[r][c-i-1]==EMPTY)
-                {
-                  if(board[r-1][c-i-1]!=EMPTY)
-                     { 
-                     horRight= (c-i-1);
-                     }
-                }
-              }
-                else{
-                     if((count==winCon-2)&&(board[r-1][c-i-1]!=EMPTY)&&(board[r][c-i-1]==EMPTY)&&(board[r][c-i-2]==token))
-                      horRight= (c-i-1);
-
-                }
-           } 
-        }
-    }
-
-    //horizontal left to right
-    for(int r = rows-1; r >= 0; r--)
-       {
-        for (int c = 0; c<cols; c++) 
-         {  count=0;
-            for(int i=0; i<=cols; i++)
-            {
-                  if(token==board[r][c-i])
-                    count++;
-
-               if(count==winCon-1)
-              {
-                if(board[r][c+i+1]==EMPTY)
-                {
-                  if(board[r-1][c+i+1]!=EMPTY)
-                     { 
-                     horLeft=(c+i+1);
-                     }
-                }
-              }
-              else {
-               if((count==winCon-2)&&(board[r][c+i+1]==EMPTY)&&(board[r-1][c+i+1]!=EMPTY)&&(board[r][c+i+2]==token))
-                horLeft=(c+i+1);
-              }
-
-         }
-       }
-    }
-
-    //vertical check if computer can win
-   for(int c = cols-1; c >= 0; c--)
-   {
-   for (int r = rows-1; r >= 0; r--) 
-        { count=0;
-           for(int i=0; i<winCon-1 ; i++)
-            {
-                
-                 if(token==board[r-i][c])
-                 { count++;}
-                  
-
-                  if(count==winCon-1)
-                  {
-                   if((board[r-i-1][c]==EMPTY))
-                    vert=c;
-                   }    
-            }
-            
-        }
-    }
-    //diagonal check if computer can win- starts at top left and goes right
-    for(int r = 0; r < rows-1; r++)
-       {
-        for (int c = 0; c < cols-1; c++) 
-         {  count=0;
-            for(int i=0; i<=cols; i++)
-            {
-               if(token==board[r+i][c+i]){
-                count++;}
-               if(count==winCon-1){
-                 if((board[r+i+1][c+i+1]==EMPTY)&&(board[r+i+2][c+i+1]!=EMPTY))
-                {
-                diagTL= (c+i+1);
-               }
-              }
-               else
-               {   if((count==winCon-2)&&(board[r+i+1][c+i+1]==EMPTY)&&(board[r+i+2][c+i+2]==token)&&(board[r+i+2][c+i+1]!=EMPTY))
-                      diagTL= (c+i+1);
-               }
-
-            }
-         }
-       }
-
-      //diagonal check if computer can win- starts at bot right 
-     for(int r = rows-1; r >= 0; r--)
-       {
-        for (int c = cols-1; c >= 0; c--) 
-         {  count=0;
-            for(int i=0; i<=cols; i++)
-            {
-               if(token==board[r-i][c-i]){
-                count++;}
-               if(count==winCon-1)
-                 {
-                     if((board[r-i-1][c-i-1]==EMPTY)&&(board[r-i][c-i-1]!=EMPTY))
-                    {
-                      diagBT= (c-i-1);
-                    } 
-               }
-                 else
-                 { if((count==winCon-2)&&(board[r-i-1][c-i-1]==EMPTY)&&(board[r-i-2][c-i-2]==token)&&(board[r-i][c-i-1]!=EMPTY))
-                    diagBT= (c-i-1);
-                   }
-            }
-         }
-       }
-  //logit time!!!!!!
-   int arr[cols];
-   if(cols%2==0)
-   {
-      arr[0] = cols/2;
-      for (int i = 1, j = 1; i < cols; i += 2, j++) 
-      {
-        arr[i] = arr[1] + j;
-            if ((i + 1) < cols) {
-                arr[i + 1] = arr[1] - j;
-            }
-        }    
-   }
-   else
-   {
-     arr[0] = (cols/2);
-     for (int i = 1, j = 1; i < cols; i += 2, j++) 
-        {
-            arr[i] = arr[0] - j;
-            arr[i + 1] = arr[0] + j;
-        }
-   } 
-   for(int i=0; i<cols; i++)
-   {
-     if(horRight==arr[i])
-     {
-       makeMove(board, rows, horRight, token);
-       return horRight;
-     }
-    if(horLeft== arr[i])
-     {
-       makeMove(board, rows, horLeft, token);
-       return horLeft;
-     }
-    if(vert==arr[i])
-     {
-       makeMove(board, rows, vert, token);
-       return vert;
-     }
-    if(diagTL== arr[i])
-     {
-       makeMove(board, rows, diagTL, token);
-       return diagTL;
-     }
-    if(diagBT== arr[i])
-     {
-       makeMove(board, rows, diagBT, token);
-       return diagBT;
-     }
-   }
-
-
-//Blocking the opponent 
-   horRight=-1;
-   horLeft=-1;
-   vert=-1;
-   diagTL=-1;
-   diagBT=-1;
-//horizontal check if computer blocks right to left
-    for (int r = rows-1; r>=0; r--) 
-    {   
-        for (int c = cols-1; c >= winCon; c--) 
-        { count=0;
-           for(int i=0; i<winCon-1; i++)
-           {
-              if(oppToken==board[r][c-i])
-               count++;
-
-              if(count==winCon-1)
-              {
-                if(board[r][c-i-1]==EMPTY)
-                {
-                  if(board[r-1][c-i-1]!=EMPTY)
-                     { 
-                     horRight= (c-i-1);
-                     }
-                }
-              }
-                else{
-                     if((count==winCon-2)&&(board[r-1][c-i-1]!=EMPTY)&&(board[r][c-i-1]==EMPTY)&&(board[r][c-i-2]==oppToken))
-                      horRight= (c-i-1);
-
-                }
-           } 
-        }
-    }
-
-    //horizontal left to right
-    for(int r = rows-1; r >= 0; r--)
-       {
-        for (int c = 0; c<cols; c++) 
-         {  count=0;
-            for(int i=0; i<=cols; i++)
-            {
-                  if(oppToken==board[r][c-i])
-                    count++;
-
-               if(count==winCon-1)
-              {
-                if(board[r][c+i+1]==EMPTY)
-                {
-                  if(board[r-1][c+i+1]!=EMPTY)
-                     { 
-                     horLeft=(c+i+1);
-                     }
-                }
-              }
-              else {
-               if((count==winCon-2)&&(board[r][c+i+1]==EMPTY)&&(board[r-1][c+i+1]!=EMPTY)&&(board[r][c+i+2]==oppToken))
-                horLeft=(c+i+1);
-              }
-
-         }
-       }
-    }
-
-    //vertical check if computer blocks
-   for(int c = cols-1; c >= 0; c--)
-   {
-   for (int r = rows-1; r >= 0; r--) 
-        { count=0;
-           for(int i=0; i<winCon-1 ; i++)
-            {
-                
-                 if(oppToken==board[r-i][c])
-                 { count++;}
-                  
-
-                  if(count==winCon-1)
-                  {
-                   if((board[r-i-1][c]==EMPTY))
-                    vert=c;
-                   }    
-            }
-            
-        }
-    }
-    //diagonal check if computer blocks- starts at top left and goes right
-    for(int r = 0; r < rows-1; r++)
-       {
-        for (int c = 0; c < cols-1; c++) 
-         {  count=0;
-            for(int i=0; i<=cols; i++)
-            {
-               if(oppToken==board[r+i][c+i]){
-                count++;}
-               if(count==winCon-1){
-                 if((board[r+i+1][c+i+1]==EMPTY)&&(board[r+i+2][c+i+1]!=EMPTY))
-                {
-                diagTL= (c+i+1);
-               }
-              }
-               else
-               {   if((count==winCon-2)&&(board[r+i+1][c+i+1]==EMPTY)&&(board[r+i+2][c+i+2]==oppToken)&&(board[r+i+2][c+i+1]!=EMPTY))
-                      diagTL= (c+i+1);
-               }
-
-            }
-         }
-       }
-
-      //diagonal check if computer can blocks- starts at bot right 
-     for(int r = rows-1; r >= 0; r--)
-       {
-        for (int c = cols-1; c >= 0; c--) 
-         {  count=0;
-            for(int i=0; i<=cols; i++)
-            {
-               if(oppToken==board[r-i][c-i]){
-                count++;}
-               if(count==winCon-1)
-                 {
-                     if((board[r-i-1][c-i-1]==EMPTY)&&(board[r-i][c-i-1]!=EMPTY))
-                    {
-                      diagBT= (c-i-1);
-                    } 
-               }
-                 else
-                 { if((count==winCon-2)&&(board[r-i-1][c-i-1]==EMPTY)&&(board[r-i-2][c-i-2]==oppToken)&&(board[r-i][c-i-1]!=EMPTY))
-                    diagBT= (c-i-1);
-                   }
-            }
-         }
-       }
-
-  
-  //More logic time!!!!!
-
-   if(cols%2==0)
-   {
-      arr[0] = cols/2;
-      for (int i = 1, j = 1; i < cols; i += 2, j++) 
-      {
-        arr[i] = arr[1] + j;
-            if ((i + 1) < cols) {
-                arr[i + 1] = arr[1] - j;
-            }
-        }    
-   }
-   else
-   {
-     arr[0] = (cols/2);
-     for (int i = 1, j = 1; i < cols; i += 2, j++) 
-        {
-            arr[i] = arr[0] - j;
-            arr[i + 1] = arr[0] + j;
-        }
-   } 
-   for(int i=0; i<cols; i++)
-   {
-     if(horRight==arr[i])
-     {
-       makeMove(board, rows, horRight, token);
-       return horRight;
-     }
-    if(horLeft== arr[i])
-     {
-       makeMove(board, rows, horLeft, token);
-       return horLeft;
-     }
-    if(vert==arr[i])
-     {
-       makeMove(board, rows, vert, token);
-       return vert;
-     }
-    if(diagTL== arr[i])
-     {
-       makeMove(board, rows, diagTL, token);
-       return diagTL;
-     }
-    if(diagBT== arr[i])
-     {
-       makeMove(board, rows, diagBT, token);
-       return diagBT;
-     }
-   }
-
-//sequence of 3!!!!!!
-
-   winCon=3; // :3
-   horRight=-1;
-   horLeft=-1;
-   vert=-1;
-   diagTL=-1;
-   diagBT=-1;
-    //horizontal check if computer can create sequence of 3
-    for (int r = rows-1; r>=0; r--) 
-    {   
-        for (int c = cols-1; c >= winCon; c--) 
-        { count=0;
-           for(int i=0; i<winCon-1; i++)
-           {
-              if(token==board[r][c-i])
-               count++;
-
-              if(count==winCon-1)
-              {
-                if(board[r][c-i-1]==EMPTY)
-                {
-                  if(board[r-1][c-i-1]!=EMPTY)
-                     { 
-                     horRight= (c-i-1);
-                     }
-                }
-              }
-                else{
-                     if((count==winCon-2)&&(board[r-1][c-i-1]!=EMPTY)&&(board[r][c-i-1]==EMPTY)&&(board[r][c-i-2]==token))
-                      horRight= (c-i-1);
-
-                }
-           } 
-        }
-    }
-
-    //horizontal left to right
-    for(int r = rows-1; r >= 0; r--)
-       {
-        for (int c = 0; c<cols; c++) 
-         {  count=0;
-            for(int i=0; i<=cols; i++)
-            {
-                  if(token==board[r][c-i])
-                    count++;
-
-               if(count==winCon-1)
-              {
-                if(board[r][c+i+1]==EMPTY)
-                {
-                  if(board[r-1][c+i+1]!=EMPTY)
-                     { 
-                     horLeft=(c+i+1);
-                     }
-                }
-              }
-              else {
-               if((count==winCon-2)&&(board[r][c+i+1]==EMPTY)&&(board[r-1][c+i+1]!=EMPTY)&&(board[r][c+i+2]==token))
-                horLeft=(c+i+1);
-              }
-
-         }
-       }
-    }
-
-    //vertical check if computer can create sequence of 3
-   for(int c = cols-1; c >= 0; c--)
-   {
-   for (int r = rows-1; r >= 0; r--) 
-        { count=0;
-           for(int i=0; i<winCon-1 ; i++)
-            {
-                
-                 if(token==board[r-i][c])
-                 { count++;}
-                  
-
-                  if(count==winCon-1)
-                  {
-                   if((board[r-i-1][c]==EMPTY))
-                    vert=c;
-                   }    
-            }
-            
-        }
-    }
-    //diagonal check if computer can create sequence of 3- starts at top left and goes right
-    for(int r = 0; r < rows-1; r++)
-       {
-        for (int c = 0; c < cols-1; c++) 
-         {  count=0;
-            for(int i=0; i<=cols; i++)
-            {
-               if(token==board[r+i][c+i]){
-                count++;}
-               if(count==winCon-1){
-                 if((board[r+i+1][c+i+1]==EMPTY)&&(board[r+i+2][c+i+1]!=EMPTY))
-                {
-                diagTL= (c+i+1);
-               }
-              }
-               else
-               {   if((count==winCon-2)&&(board[r+i+1][c+i+1]==EMPTY)&&(board[r+i+2][c+i+2]==token)&&(board[r+i+2][c+i+1]!=EMPTY))
-                      diagTL= (c+i+1);
-               }
-
-            }
-         }
-       }
-
-      //diagonal check if computer create sequence of 3- starts at bot right 
-     for(int r = rows-1; r >= 0; r--)
-       {
-        for (int c = cols-1; c >= 0; c--) 
-         {  count=0;
-            for(int i=0; i<=cols; i++)
-            {
-               if(token==board[r-i][c-i]){
-                count++;}
-               if(count==winCon-1)
-                 {
-                     if((board[r-i-1][c-i-1]==EMPTY)&&(board[r-i][c-i-1]!=EMPTY))
-                    {
-                      diagBT= (c-i-1);
-                    } 
-               }
-                 else
-                 { if((count==winCon-2)&&(board[r-i-1][c-i-1]==EMPTY)&&(board[r-i-2][c-i-2]==token)&&(board[r-i][c-i-1]!=EMPTY))
-                    diagBT= (c-i-1);
-                   }
-            }
-         }
-       }
-   
-    //Logic time once again
-  
-   if(cols%2==0)
-   {
-      arr[0] = cols/2;
-      for (int i = 1, j = 1; i < cols; i += 2, j++) 
-      {
-        arr[i] = arr[1] + j;
-            if ((i + 1) < cols) {
-                arr[i + 1] = arr[1] - j;
-            }
-        }    
-   }
-   else
-   {
-     arr[0] = (cols/2);
-     for (int i = 1, j = 1; i < cols; i += 2, j++) 
-        {
-            arr[i] = arr[0] - j;
-            arr[i + 1] = arr[0] + j;
-        }
-   } 
-   for(int i=0; i<cols; i++)
-   {
-     if(horRight==arr[i])
-     {
-       makeMove(board, rows, horRight, token);
-       return horRight;
-     }
-    if(horLeft== arr[i])
-     {
-       makeMove(board, rows, horLeft, token);
-       return horLeft;
-     }
-    if(vert==arr[i])
-     {
-       makeMove(board, rows, vert, token);
-       return vert;
-     }
-    if(diagTL== arr[i])
-     {
-       makeMove(board, rows, diagTL, token);
-       return diagTL;
-     }
-    if(diagBT== arr[i])
-     {
-       makeMove(board, rows, diagBT, token);
-       return diagBT;
-     }
-   }
-   
-  //blocking the opponent 
-   horRight=-1;
-   horLeft=-1;
-   vert=-1;
-   diagTL=-1;
-   diagBT=-1;
-//horizontal check if computer blocks right to left
-    for (int r = rows-1; r>=0; r--) 
-    {   
-        for (int c = cols-1; c >= winCon; c--) 
-        { count=0;
-           for(int i=0; i<winCon-1; i++)
-           {
-              if(oppToken==board[r][c-i])
-               count++;
-
-              if(count==winCon-1)
-              {
-                if(board[r][c-i-1]==EMPTY)
-                {
-                  if(board[r-1][c-i-1]!=EMPTY)
-                     { 
-                     horRight= (c-i-1);
-                     }
-                }
-              }
-                else{
-                     if((count==winCon-2)&&(board[r-1][c-i-1]!=EMPTY)&&(board[r][c-i-1]==EMPTY)&&(board[r][c-i-2]==oppToken))
-                      horRight= (c-i-1);
-
-                }
-           } 
-        }
-    }
-
-    //horizontal left to right
-    for(int r = rows-1; r >= 0; r--)
-       {
-        for (int c = 0; c<cols; c++) 
-         {  count=0;
-            for(int i=0; i<=cols; i++)
-            {
-                  if(oppToken==board[r][c-i])
-                    count++;
-
-               if(count==winCon-1)
-              {
-                if(board[r][c+i+1]==EMPTY)
-                {
-                  if(board[r-1][c+i+1]!=EMPTY)
-                     { 
-                     horLeft=(c+i+1);
-                     }
-                }
-              }
-              else {
-               if((count==winCon-2)&&(board[r][c+i+1]==EMPTY)&&(board[r-1][c+i+1]!=EMPTY)&&(board[r][c+i+2]==oppToken))
-                horLeft=(c+i+1);
-              }
-
-         }
-       }
-    }
-
-    //vertical check if computer blocks
-   for(int c = cols-1; c >= 0; c--)
-   {
-   for (int r = rows-1; r >= 0; r--) 
-        { count=0;
-           for(int i=0; i<winCon-1 ; i++)
-            {
-                
-                 if(oppToken==board[r-i][c])
-                 { count++;}
-                  
-
-                  if(count==winCon-1)
-                  {
-                   if((board[r-i-1][c]==EMPTY))
-                    vert=c;
-                   }    
-            }
-            
-        }
-    }
-    //diagonal check if computer blocks- starts at top left and goes right
-    for(int r = 0; r < rows-1; r++)
-       {
-        for (int c = 0; c < cols-1; c++) 
-         {  count=0;
-            for(int i=0; i<=cols; i++)
-            {
-               if(oppToken==board[r+i][c+i]){
-                count++;}
-               if(count==winCon-1){
-                 if((board[r+i+1][c+i+1]==EMPTY)&&(board[r+i+2][c+i+1]!=EMPTY))
-                {
-                diagTL= (c+i+1);
-               }
-              }
-               else
-               {   if((count==winCon-2)&&(board[r+i+1][c+i+1]==EMPTY)&&(board[r+i+2][c+i+2]==oppToken)&&(board[r+i+2][c+i+1]!=EMPTY))
-                      diagTL= (c+i+1);
-               }
-
-            }
-         }
-       }
-
-      //diagonal check if computer can blocks- starts at bot right 
-     for(int r = rows-1; r >= 0; r--)
-       {
-        for (int c = cols-1; c >= 0; c--) 
-         {  count=0;
-            for(int i=0; i<=cols; i++)
-            {
-               if(oppToken==board[r-i][c-i]){
-                count++;}
-               if(count==winCon-1)
-                 {
-                     if((board[r-i-1][c-i-1]==EMPTY)&&(board[r-i][c-i-1]!=EMPTY))
-                    {
-                      diagBT= (c-i-1);
-                    } 
-               }
-                 else
-                 { if((count==winCon-2)&&(board[r-i-1][c-i-1]==EMPTY)&&(board[r-i-2][c-i-2]==oppToken)&&(board[r-i][c-i-1]!=EMPTY))
-                    diagBT= (c-i-1);
-                   }
-            }
-         }
-       }
-
-   //Final logic!!!!!!!
-
-   if(cols%2==0)
-   {
-      arr[0] = cols/2;
-      for (int i = 1, j = 1; i < cols; i += 2, j++) 
-      {
-        arr[i] = arr[1] + j;
-            if ((i + 1) < cols) {
-                arr[i + 1] = arr[1] - j;
-            }
-        }    
-   }
-   else
-   {
-     arr[0] = (cols/2);
-     for (int i = 1, j = 1; i < cols; i += 2, j++) 
-        {
-            arr[i] = arr[0] - j;
-            arr[i + 1] = arr[0] + j;
-        }
-   } 
-   for(int i=0; i<cols; i++)
-   {
-     if(horRight==arr[i])
-     {
-       makeMove(board, rows, horRight, token);
-       return horRight;
-     }
-    if(horLeft== arr[i])
-     {
-       makeMove(board, rows, horLeft, token);
-       return horLeft;
-     }
-    if(vert==arr[i])
-     {
-       makeMove(board, rows, vert, token);
-       return vert;
-     }
-    if(diagTL== arr[i])
-     {
-       makeMove(board, rows, diagTL, token);
-       return diagTL;
-     }
-    if(diagBT== arr[i])
-     {
-       makeMove(board, rows, diagBT, token);
-       return diagBT;
-     }
-   }
+      //blocking opp win
+       if(checkCompCanWin(board, rows, cols,winCon-1 ,oppToken, token)!=-1)
+         return checkCompCanWin(board, rows, cols,winCon-1 ,token, token);
+   //create sequence of 3
+   if(checkCompCanWin(board, rows, cols,winCon-2 ,token, token)!=-1)
+      return checkCompCanWin(board, rows, cols,winCon-2 ,token, token);
+   //blocking sequence of 3
+   if(checkCompCanWin(board, rows, cols,winCon-2 ,oppToken, token)!=-1)
+      return checkCompCanWin(board, rows, cols,winCon-2 ,oppToken, token);
 
    //arbitrary ordering rule
-
-
-   if(cols%2==0)
-   {
-      arr[0] = cols/2;
-      for (int i = 1, j = 1; i < cols; i += 2, j++) 
-      {
-        arr[i] = arr[1] + j;
+   int priority[cols];
+    if (cols%2 == 0) {
+        priority[0] = cols/2 - 1;
+        for (int i = 1, j = 1; i < cols; i += 2, j++) {
+            priority[i] = priority[0] + j;
             if ((i + 1) < cols) {
-                arr[i + 1] = arr[1] - j;
+                priority[i + 1] = priority[0] - j;
             }
-        }    
-   }
-   else
-   {
-     arr[0] = (cols/2);
-     for (int i = 1, j = 1; i < cols; i += 2, j++) 
-        {
-            arr[i] = arr[0] - j;
-            arr[i + 1] = arr[0] + j;
         }
-   } 
-   for(int i=0; i<cols; i++)
-   {
-      for(int r = 0; r<rows; r++)
-    {
-        if(board[r][arr[i]]==EMPTY)
-        {
-          makeMove(board, rows, arr[i], token);
+    } else {
+        priority[0] = cols/2;
+        for (int i = 1, j = 1; i < cols; i += 2, j++) {
+            priority[i] = priority[0] - j;
+            priority[i + 1] = priority[0] + j;
         }
     }
-   }
-
-
-
-return 0;
+  for (int i = 0; i < cols; i++) {
+        if ((isColumnEmptyPC(board, rows, priority[i]))) 
+        {
+            makeMove(board, rows, priority[i], token);
+            return priority[i];
+        }
+}
+return 99;
 }
 
 void runConnectFour(char board[][COLS], int rows,  int cols, int p1Type, int p2Type)
@@ -1038,12 +491,16 @@ void runConnectFour(char board[][COLS], int rows,  int cols, int p1Type, int p2T
     {   printf("Player 1 (X) turn.\n");
         if(p1Type==HUMAN)
         { 
-         selection = askNumber(board, rows, cols);
+         selection = (askNumber(board, rows, cols)-1);
          makeMove(board, rows, selection, TOKEN_P1);
          printBoard(board, rows, cols);
         }
          else
-          computerChoose(board, rows, cols, TOKEN_P1, CONNECT_N);
+           {
+             int compCoice= computerChoose(board, rows, cols, TOKEN_P1, CONNECT_N);
+             printf("comp chose: %d\n", compCoice+1);
+             printBoard(board, rows, cols);
+           }
         if(checkVictory(board, rows, cols, CONNECT_N, TOKEN_P1))
         {
          printf("Player 1 (X) wins!\n");
@@ -1057,12 +514,16 @@ void runConnectFour(char board[][COLS], int rows,  int cols, int p1Type, int p2T
         printf("Player 2 (O) turn.\n");
         if(p2Type==HUMAN)
         { 
-            selection = askNumber(board, rows, COLS);
+            selection = (askNumber(board, rows, cols)-1);
             makeMove(board, rows, selection, TOKEN_P2);
             printBoard(board, rows, cols);
         }
-           else 
-             computerChoose(board, rows, cols, TOKEN_P2, CONNECT_N);
+           else
+           {
+             int compCoice= computerChoose(board, rows, cols, TOKEN_P2, CONNECT_N);
+             printf("comp chose: %d\n", compCoice+1);
+             printBoard(board, rows, cols);
+           }
          if(checkVictory(board, rows, cols, CONNECT_N, TOKEN_P2))
         {
         printf("Player 2 (O) wins!\n");
@@ -1075,8 +536,3 @@ void runConnectFour(char board[][COLS], int rows,  int cols, int p1Type, int p2T
         }
      }
     }
-
-
-
-
-
