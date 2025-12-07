@@ -200,38 +200,58 @@ int checkVictory(char board[][COLS], int rows, int cols, int winCon, char token)
             }
         }
     }
+  
 
-    // Diagonal check (Right to Left)
-    for (int r = rows - 1; r >= 0; r--) {
-        for (int c = cols - 1; c >= 0; c--) {
-            count = 0;  
-            
-            for (int i = 0; i < winCon; i++) {
-                if (r - i >= 0 && c - i >= 0 && token == board[r - i][c - i]) {
-                    count++;
-                } else {
-                    break;
+    //diagonal checks
+     for (int i = 0; i < rows; i++) {
+        for(int j = 0; j < cols; j++) {
+            if (board[i][j] == token) {
+                count = 0;
+                for (int k = j; k < cols; k++) {
+                    if (board[i][k] == token) {
+                        count++;
+                        if (count >= winCon) {
+                            return TRUE;
+                        }
+                    } else {
+                        break;
+                    }
                 }
-                if (count == winCon&&(board[r-i+1][c-i]==EMPTY)) {
-                    return TRUE;
-                }
-            }
-        }
-    }
 
-    // Diagonal check (Left to Right)
-    for (int r = rows - 1; r >= 0; r--) {
-        for (int c = 0; c < cols; c++) {
-            count = 0;  
-            
-            for (int i = 0; i < winCon; i++) {
-                if (r - i >= 0 && c + i < cols && token == board[r - i][c + i]) {
-                    count++;
-                } else {
-                    break;
+                count = 0;
+                for (int k = i; k < rows; k++) {
+                    if (board[k][j] == token) {
+                        count++;
+                        if (count >= winCon) {
+                            return TRUE;
+                        }
+                    } else {
+                        break;
+                    }
                 }
-                if (count == winCon) {
-                    return TRUE;
+
+                count = 0;
+                for (int l = i, k = j; l < rows && k < cols; l++, k++) {
+                    if (board[l][k] == token) {
+                        count++;
+                        if (count >= winCon) {
+                            return TRUE;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                count = 0;
+                for (int l = i, k = j; l >= 0 && k < cols; l--, k++) {
+                    if (board[l][k] == token) {
+                        count++;
+                        if (count >= winCon) {
+                            return TRUE;
+                        }
+                    } else {
+                        break;
+                    }
                 }
             }
         }
