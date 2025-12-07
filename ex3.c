@@ -67,34 +67,37 @@ int main() {
 
 void initBoard(char board[][COLS], int rows, int cols)
 {
-    for(int r=0; r<=rows; r++)
+    for(int r=0; r<rows; r++)
     {
-        for(int c=0; c<=cols; c++)
+        for(int c=0; c<cols; c++)
         {
-            board[c][r]=EMPTY;
+            board[r][c]=EMPTY;
         }
     }
 }
 
 
+//checks if input is valid (in bounds, is not full and not a char)
 int askNumber(char board[][COLS], int rows, int cols)
 {   int selection;
-    int forever=0;
-    printf("Enter column (1-%d) : \n", cols);
-    while(forever==0)
-    {
-        scanf("%d", &selection);
-        if(isInBounds(cols, selection))
-          if(!isColumnFull(board, rows, selection))
-          { 
+    while (TRUE) {
+        printf("Enter column (1-%d): ", cols);
+        int check = scanf("%d", &selection);
+        if (check != 1) {
+            printf("Invalid input. Enter a number.\n");
+            while (getchar() != '\n'); // clear input buffer
+            continue;
+        }
+        if(isInBounds(cols, selection)){
+         if(!isColumnFull(board, rows, selection)){ 
             return selection;
           }
-     continue;
-    }
-    return 0;
+         continue;
+        }
+}
 }
 
-
+//self explanatory I think
 int isColumnFull(char board[][COLS], int rows, int selection)
 {
     for(int r = rows-1; r>=0; r--)
@@ -109,6 +112,7 @@ int isColumnFull(char board[][COLS], int rows, int selection)
   return TRUE;      
 }
 
+//checks if column is empty without printing anything for the computer
 int isColumnEmptyPC(char board[][COLS], int rows, int selection)
 {
     for(int r = rows-1; r>=0; r--)
@@ -122,8 +126,7 @@ int isColumnEmptyPC(char board[][COLS], int rows, int selection)
   return FALSE;      
 }
 
-
-
+//checks of board is full
 int isBoardFull(char board[][COLS], int rows, int cols)
 { 
     for (int r = rows-1; r>=0; r--) 
@@ -137,19 +140,20 @@ int isBoardFull(char board[][COLS], int rows, int cols)
     return TRUE;
 }
 
-
+//checks if selection is in the bounds of the array
 int isInBounds(int cols, int selection)
-{
-
+{   
     if(!((selection<=cols)&&(selection>0)))
     {
-       printf("Invalid Input\n");
+       printf("Invalid column. Choose between 1 and %d.\n", cols);
        return FALSE;
     }
     else 
      return TRUE;
 }
 
+
+//makes move
 void makeMove(char board[][COLS], int rows, int selection, char token)
 {
          for(int r = rows-1; r>=0; r--)
@@ -163,6 +167,8 @@ void makeMove(char board[][COLS], int rows, int selection, char token)
      
 }
 
+
+//checks if someone won
 int checkVictory(char board[][COLS], int rows, int cols, int winCon, char token) {
     int count = 0;
     // Horizontal check
@@ -236,7 +242,7 @@ int checkVictory(char board[][COLS], int rows, int cols, int winCon, char token)
 
 
 
-
+//prints board
 void printBoard(char board[][COLS], int rows, int cols) {
     printf("\n");
     for (int r = 0; r < rows; r++) {
@@ -252,6 +258,9 @@ void printBoard(char board[][COLS], int rows, int cols) {
     }
     printf("\n\n");
 }
+
+
+
 int getPlayerType(int playerNumber) {
     char ch;
     while (1) {
@@ -270,6 +279,10 @@ int getPlayerType(int playerNumber) {
     }
 }
 
+
+
+
+//checks if computer makes any move based on the given priority
 int checkCompCanWin(char board[][COLS], int rows, int cols, int winCon, char token)
 {
    int priority[cols];
@@ -309,7 +322,7 @@ return -1;
 }
 
 
-
+//checking if computer can win/block/create sequence of 3 (used inside checkCompCanWIn)
 int comCanWinThree(char board[][COLS], int rows, int cols, int currentRow, int currentCol, int winCon, char token)
 {
     int count=1;
@@ -423,7 +436,7 @@ int comCanWinThree(char board[][COLS], int rows, int cols, int currentRow, int c
  return FALSE;
 }
 
-//I'm sorry in advance
+//Makes move for computer
 int computerChoose(char board[][COLS], int rows, int cols, char token, int winCon)
 { 
    char oppToken;
@@ -503,7 +516,7 @@ void runConnectFour(char board[][COLS], int rows,  int cols, int p1Type, int p2T
          else
            {
              int compCoice= computerChoose(board, rows, cols, TOKEN_P1, CONNECT_N);
-             printf("comp chose: %d\n", compCoice+1);
+             printf("Computer chose column %d\n", compCoice+1);
              printBoard(board, rows, cols);
            }
         if(checkVictory(board, rows, cols, CONNECT_N, TOKEN_P1))
@@ -526,7 +539,7 @@ void runConnectFour(char board[][COLS], int rows,  int cols, int p1Type, int p2T
            else
            {
              int compCoice= computerChoose(board, rows, cols, TOKEN_P2, CONNECT_N);
-             printf("comp chose: %d\n", compCoice+1);
+             printf("Computer chose column %d\n", compCoice+1);
              printBoard(board, rows, cols);
            }
          if(checkVictory(board, rows, cols, CONNECT_N, TOKEN_P2))
